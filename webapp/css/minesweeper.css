@@ -1,0 +1,19 @@
+body {
+    font-family      : "Lucida Console", Monaco, monospace;
+    background-color : steelblue;
+    color            : black;
+}
+
+h1 {
+    text-align : center;
+}
+
+canvas {
+    background-color : cornsilk;
+    border           : ridge;
+}
+
+.center {
+    width   : 60%;
+    margin  : 0 auto;
+}
