@@ -1,11 +1,4 @@
 
-const eventCoord = event => {
-    const rect = event.target.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
-    return { x: x, y: y }
-}
-
 window.onload = () => {
     console.log('[ ui ] we made it')
 
@@ -15,6 +8,13 @@ window.onload = () => {
 
     const ctx = canvas.getContext('2d')
     game.init(ctx)
+
+    const eventCoord = event => {
+        const rect = event.target.getBoundingClientRect()
+        const x = event.clientX - rect.left
+        const y = event.clientY - rect.top
+        return { x: x, y: y }
+    }
 
     startBtn.addEventListener('click', event => {
         console.log('[ ui ] start button clicked')

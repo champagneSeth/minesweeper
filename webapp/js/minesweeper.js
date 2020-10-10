@@ -1,9 +1,6 @@
 
-
 const game = (function () {
-    const lineColor = "darkgrey"
-    const hoverColor = "cornflowerblue"
-
+    const font = '40px "Lucida Console", Monaco, monospace'
     const lineWdith = 2
     const padding = 10
     const fullPadding = padding * 2
@@ -28,18 +25,21 @@ const game = (function () {
 
         // init style
         ctx.lineWidth = lineWdith
-        ctx.strokeStyle = lineColor
+        ctx.font = font
 
         start(ctx)
     }
 
     const start = ctx => {
-        // create matrix
-        matrix.length = 0
+        // clear matrix
+        while (matrix.length != 0) matrix.pop()
+
+        // create new matrix
         for (let row = 0, y = yorigin; row < rows; row++, y += yres) {
             const m = []
             for (let col = 0, x = xorigin; col < cols; col++, x += xres) {
-                let box = createBox(ctx, x, y, xres, yres)
+                const box = createBox(ctx, x, y, xres, yres)
+                box.row = row; box.col = col
                 box.draw()
                 m.push(box)
             }
@@ -58,8 +58,37 @@ const game = (function () {
                 }
             }
         }
+
+
+        // count mines
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                let count = 0
+                const box = matrix[row][col]
+
+                if (checkForMine(row - 1, col - 1)) count++
+                if (checkForMine(row - 1, col + 0)) count++
+                if (checkForMine(row - 1, col + 1)) count++
+
+                if (checkForMine(row + 0, col - 1)) count++
+                if (checkForMine(row + 0, col + 1)) count++
+
+                if (checkForMine(row + 1, col - 1)) count++
+                if (checkForMine(row + 1, col + 0)) count++
+                if (checkForMine(row + 1, col + 1)) count++
+
+                box.count = count
+            }
+        }
     }
 
+    const exists = (row, col) => {
+        return !(row < 0 || row == rows || col < 0 || col == cols)
+    }
+
+    const checkForMine = (row, col) => {
+        return exists(row, col) && matrix[row][col].isMine
+    }
 
     const boxLookup = (x, y) => {
         const row = Math.floor((y - yorigin) / yres)
@@ -78,7 +107,7 @@ const game = (function () {
         const box = boxLookup(x, y)
         if (hoverBox) hoverBox.draw()
         hoverBox = box
-        if (hoverBox && !hoverBox.selected) hoverBox.fillBox(hoverColor)
+        if (hoverBox && !hoverBox.selected) hoverBox.hover()
     }
 
     const clear = () => {
@@ -94,11 +123,43 @@ const game = (function () {
         })
     }
 
+    const queue = []
+    const revealIfExists = (row, col) => {
+        if (exists(row, col)) {
+            const box = matrix[row][col]
+            if (!box.selected && !queue.includes(box)) queue.push(box)
+        }
+    }
+
+    const reveal = (box) => {
+        box.selected = true
+        box.draw()
+        const row = box.row
+        const col = box.col
+        if (box.count === 0) {
+            revealIfExists(row - 1, col - 1)
+            revealIfExists(row - 1, col + 0)
+            revealIfExists(row - 1, col + 1)
+
+            revealIfExists(row + 0, col - 1)
+            revealIfExists(row + 0, col + 1)
+
+            revealIfExists(row + 1, col - 1)
+            revealIfExists(row + 1, col + 0)
+            revealIfExists(row + 1, col + 1)
+        }
+        while (queue.length > 0) {
+            reveal(queue.pop())
+        }
+    }
+
     const leftClick = (x, y) => {
         const box = boxLookup(x, y)
         if (box) {
             box.selected = true
             box.draw()
+            if (box.isMine) alert('dang')
+            reveal(box)
         }
     }
 
@@ -111,13 +172,8 @@ const game = (function () {
     }
 
     return {
-        init: init,
-        start: start,
-        quit, quit,
-        hover: hover,
-        clear: clear,
-        leftClick: leftClick,
-        rightClick: rightClick,
+        init, start, quit,
+        hover, clear,
+        leftClick, rightClick,
     }
-
 }());
