@@ -1,6 +1,11 @@
 
+const emojis = [
+    '🙂', '🤣', '🤨', '🤔', '😗', '😮', '😎',
+]
+
 window.onload = () => {
     const canvas = document.getElementById('canvas')
+    const emoji = document.getElementById('emoji')
     const numMines = document.getElementById('num-mines')
     const startBtn = document.getElementById('start-btn')
     const quitBtn = document.getElementById('quit-btn')
