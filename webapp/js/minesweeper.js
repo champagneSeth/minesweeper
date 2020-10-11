@@ -1,6 +1,6 @@
 
-const game = (function () {
-    const font = '40px "Lucida Console", Monaco, monospace'
+const minesweeper = (function () {
+    const font = '30px "Lucida Console", Monaco, monospace'
     const lineWdith = 2
     const padding = 10
     const fullPadding = padding * 2
@@ -10,10 +10,14 @@ const game = (function () {
 
     const rows = 16
     const cols = 16
-    const numMines = 20
+    const numMines = 40
+    const allCleared = (rows * cols) - numMines
     const matrix = []
 
     let width, height, yres, xres
+    let minesAssigned = false
+    let foundMines = 0
+    let cleared = 0
 
     const init = ctx => {
         ctx = ctx
@@ -34,6 +38,10 @@ const game = (function () {
         // clear matrix
         while (matrix.length != 0) matrix.pop()
 
+        minesAssigned = false
+        foundMines = 0
+        cleared = 0
+
         // create new matrix
         for (let row = 0, y = yorigin; row < rows; row++, y += yres) {
             const m = []
@@ -45,12 +53,25 @@ const game = (function () {
             }
             matrix.push(m)
         }
+    }
+
+    const initMines = (clickedBox) => {
+        minesAssigned = true
 
         // assign mines
         for (let i = 0, searching = true; i < numMines; i++, searching = true) {
             while (searching) {
                 const row = Math.floor(Math.random() * rows)
                 const col = Math.floor(Math.random() * cols)
+
+                let notAllowed = row === clickedBox.row && col === clickedBox.col
+                allAdjacentBoxes(clickedBox.row, clickedBox.col, adjacent => {
+                    if (row === adjacent.row && col === adjacent.col) {
+                        notAllowed = true
+                    }
+                })
+                if (notAllowed) continue
+
                 const box = matrix[row][col]
                 if (!box.isMine) {
                     box.isMine = true
@@ -59,25 +80,14 @@ const game = (function () {
             }
         }
 
-
         // count mines
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 let count = 0
-                const box = matrix[row][col]
-
-                if (checkForMine(row - 1, col - 1)) count++
-                if (checkForMine(row - 1, col + 0)) count++
-                if (checkForMine(row - 1, col + 1)) count++
-
-                if (checkForMine(row + 0, col - 1)) count++
-                if (checkForMine(row + 0, col + 1)) count++
-
-                if (checkForMine(row + 1, col - 1)) count++
-                if (checkForMine(row + 1, col + 0)) count++
-                if (checkForMine(row + 1, col + 1)) count++
-
-                box.count = count
+                allAdjacentBoxes(row, col, box => {
+                    if (box.isMine) count++
+                })
+                matrix[row][col].count = count
             }
         }
     }
@@ -86,8 +96,17 @@ const game = (function () {
         return !(row < 0 || row == rows || col < 0 || col == cols)
     }
 
-    const checkForMine = (row, col) => {
-        return exists(row, col) && matrix[row][col].isMine
+    const allAdjacentBoxes = (row, col, func) => {
+        if (exists(row - 1, col - 1)) func(matrix[row - 1][col - 1])
+        if (exists(row - 1, col + 0)) func(matrix[row - 1][col + 0])
+        if (exists(row - 1, col + 1)) func(matrix[row - 1][col + 1])
+
+        if (exists(row + 0, col - 1)) func(matrix[row + 0][col - 1])
+        if (exists(row + 0, col + 1)) func(matrix[row + 0][col + 1])
+
+        if (exists(row + 1, col - 1)) func(matrix[row + 1][col - 1])
+        if (exists(row + 1, col + 0)) func(matrix[row + 1][col + 0])
+        if (exists(row + 1, col + 1)) func(matrix[row + 1][col + 1])
     }
 
     const boxLookup = (x, y) => {
@@ -123,51 +142,54 @@ const game = (function () {
         })
     }
 
-    const queue = []
-    const revealIfExists = (row, col) => {
-        if (exists(row, col)) {
-            const box = matrix[row][col]
-            if (!box.selected && !queue.includes(box)) queue.push(box)
+    const checkForWin = box => {
+        if (!box.selected && ++cleared === allCleared) {
+            alert('we made it')
         }
     }
 
     const reveal = (box) => {
+        checkForWin(box)
         box.selected = true
         box.draw()
+
         const row = box.row
         const col = box.col
+
         if (box.count === 0) {
-            revealIfExists(row - 1, col - 1)
-            revealIfExists(row - 1, col + 0)
-            revealIfExists(row - 1, col + 1)
-
-            revealIfExists(row + 0, col - 1)
-            revealIfExists(row + 0, col + 1)
-
-            revealIfExists(row + 1, col - 1)
-            revealIfExists(row + 1, col + 0)
-            revealIfExists(row + 1, col + 1)
-        }
-        while (queue.length > 0) {
-            reveal(queue.pop())
+            const queue = []
+            allAdjacentBoxes(row, col, adjacent => {
+                if (!adjacent.selected && !queue.includes(adjacent)) {
+                    queue.push(adjacent)
+                }
+            })
+            while (queue.length > 0) {
+                reveal(queue.pop())
+            }
         }
     }
 
     const leftClick = (x, y) => {
         const box = boxLookup(x, y)
+        if (!minesAssigned) {
+            initMines(box)
+        }
         if (box) {
-            box.selected = true
-            box.draw()
-            if (box.isMine) alert('dang')
+            if (box.isMine) {
+                box.selected = true
+                box.draw()
+                alert('dang')
+            }
             reveal(box)
         }
     }
 
-    const rightClick = (x, y) => {
+    const rightClick = (x, y, callback) => {
         const box = boxLookup(x, y)
         if (box) {
             box.marked = true
             box.draw()
+            callback(numMines - ++foundMines)
         }
     }
 

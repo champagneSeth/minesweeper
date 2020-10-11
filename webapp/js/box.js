@@ -4,6 +4,7 @@ const createBox = (ctx, x, y, width, height) => {
     const unselectedColor = 'gainsboro'
     const markedColor = 'darksalmon'
     const hoverColor = 'cornflowerblue'
+
     const countColors = [
         'darkgrey',     // 0
         'darkseagreen', // 1

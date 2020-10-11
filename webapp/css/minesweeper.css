@@ -8,6 +8,10 @@ h1 {
     text-align : center;
 }
 
+p {
+    text-align : center;
+}
+
 canvas {
     background-color : cornsilk;
     border           : ridge;

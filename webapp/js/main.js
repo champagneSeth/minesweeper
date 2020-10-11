@@ -1,13 +1,12 @@
 
 window.onload = () => {
-    console.log('[ ui ] we made it')
-
-    const canvas = document.getElementById("canvas")
+    const canvas = document.getElementById('canvas')
+    const numMines = document.getElementById('num-mines')
     const startBtn = document.getElementById('start-btn')
     const quitBtn = document.getElementById('quit-btn')
 
     const ctx = canvas.getContext('2d')
-    game.init(ctx)
+    minesweeper.init(ctx)
 
     const eventCoord = event => {
         const rect = event.target.getBoundingClientRect()
@@ -16,23 +15,25 @@ window.onload = () => {
         return { x: x, y: y }
     }
 
+    const updateCount = count => {
+        numMines.innerHTML = count
+    }
+
     startBtn.addEventListener('click', event => {
-        console.log('[ ui ] start button clicked')
-        game.start(ctx)
+        minesweeper.start(ctx)
     })
 
     quitBtn.addEventListener('click', event => {
-        console.log('[ ui ] quit button clicked')
-        game.quit()
+        minesweeper.quit()
     })
 
     canvas.addEventListener('mousemove', event => {
         const coord = eventCoord(event)
-        game.hover(coord.x, coord.y)
+        minesweeper.hover(coord.x, coord.y)
     })
 
     canvas.addEventListener('mouseexit', event => {
-        game.clear()
+        minesweeper.clear()
     })
 
     canvas.addEventListener('mousedown', event => {
@@ -40,10 +41,10 @@ window.onload = () => {
         const coord = eventCoord(event)
         switch (event.button) {
             case 0: // left click
-                game.leftClick(coord.x, coord.y)
+                minesweeper.leftClick(coord.x, coord.y)
                 break;
             case 2: // right click
-                game.rightClick(coord.x, coord.y)
+                minesweeper.rightClick(coord.x, coord.y, updateCount)
                 break;
             default:
         }
