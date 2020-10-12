@@ -8,13 +8,17 @@
 </head>
 
 <body>
-    <h1>Minesweeper</h1>
-    <p><span id="emoji">🙂</span> Num mines: <span id="num-mines">40</span></p>
+    <div>
+        <h1>Minesweeper</h1>
+        <p>Clear all spaces without clicking a mine</p>
+        <p>Left click to clear space, Right click to mark space</p>
+        <p><span id="emoji">🙂</span> Num mines: <span id="num-mines">40</span></p>
+    </div>
     <div id="game" class="center">
         <canvas id="canvas" width="620" height="620" oncontextmenu="event.preventDefault()"></canvas>
     </div>
-    <div id="controls" class="center">
-        <button id="start-btn">Start</button>
+    <div class="center space">
+        <button id="start-btn" class="space">Start</button>
         <button id="quit-btn">Quit</button>
     </div>
     <script src="/js/box.js"></script>
