@@ -8,6 +8,6 @@ Game hosted on [http://localhost:8080/](http://localhost:8080/)
 
 ### todo
 - highlight mistake boxes on loss
-- add difiiculty selector
+- add difficulty selector
 - add timer (and highscore?)
 - add explosion noises
