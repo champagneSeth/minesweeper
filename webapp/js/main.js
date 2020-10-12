@@ -1,3 +1,6 @@
+/*
+ * UI integrations
+ */
 
 const emojis = {
     smile: '🙂',
@@ -11,12 +14,14 @@ const emojis = {
 
 window.onload = () => {
 
+    // elements from index.html
     const canvas = document.getElementById('canvas')
     const emoji = document.getElementById('emoji')
     const numMines = document.getElementById('num-mines')
     const startBtn = document.getElementById('start-btn')
     const quitBtn = document.getElementById('quit-btn')
 
+    // compute pixel point of event on canvas
     const eventPoint = event => {
         const rect = event.target.getBoundingClientRect()
         const x = event.clientX - rect.left
@@ -24,6 +29,8 @@ window.onload = () => {
         return { x: x, y: y }
     }
 
+
+    // override state callbacks
     state.win = msg => {
         emoji.innerHTML = emojis['cool']
         console.log(msg)
@@ -38,6 +45,8 @@ window.onload = () => {
         numMines.innerHTML = count
     }
 
+
+    // event listeners
     startBtn.addEventListener('click', event => {
         emoji.innerHTML = emojis['smile']
         minesweeper.start()
@@ -83,6 +92,7 @@ window.onload = () => {
         }
     })
 
+    // begin fisrst game
     matrix.init(canvas.getContext('2d'))
     minesweeper.start()
 }

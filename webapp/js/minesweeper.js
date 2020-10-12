@@ -1,15 +1,25 @@
+/*
+ * Controller for the game
+ */
 
+// game state
 const state = {
     playing: false,
     numMines: 40,
     foundMines: 0,
     cleared: 0,
+
+    // NOTE: override these callbacks
+    win: () => { },
+    lose: () => { },
+    update: () => { },
 }
 
+// game logic
 const minesweeper = (function () {
 
+    // start new game
     const start = () => {
-        // clear matrix
         matrix.reset()
         state.playing = true
         state.foundMines = 0
@@ -17,11 +27,13 @@ const minesweeper = (function () {
         state.update(numMines)
     }
 
+    // end game
     const quit = () => {
         state.playing = false
         matrix.forEach(box => box.select())
     }
 
+    // update hover
     let hoverBox
     const hover = (point) => {
         if (hoverBox) hoverBox.draw()
@@ -81,8 +93,5 @@ const minesweeper = (function () {
         }
     }
 
-    return {
-        start, quit,
-        hover, leftClick, rightClick,
-    }
+    return { start, quit, hover, leftClick, rightClick, }
 }());
