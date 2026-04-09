@@ -79,11 +79,11 @@ window.onload = () => {
         }
     })
 
-    let count = 0 // use counter to rotate emojis
+    let emojiFlip = 0 // use counter to rotate emojis
     canvas.addEventListener('mouseup', event => {
         if (state.playing) {
             let chosen
-            switch (count++ % 3) {
+            switch (emojiFlip++ % 3) {
                 case 0: chosen = 'smile'; break
                 case 1: chosen = 'wow'; break
                 case 2: chosen = 'kiss'; break

@@ -66,31 +66,32 @@ const createBox = (ctx, x, y, row, col, width, height) => {
         row: row,
         col: col,
         isMine: false,
-        selected: false,
-        marked: false,
+        isSelected: false,
+        isMarked: false,
         count: 0,
 
         // reset box for new game
         reset: function () {
             this.isMine = false
-            this.selected = false
-            this.marked = false
+            this.isSelected = false
+            this.isMarked = false
             this.count = 0
             this.draw()
         },
 
         // box selected
         select: function () {
-            this.selected = true
+            if (this.isSelected) return
+            this.isSelected = true
             this.draw()
-            if (this.marked) {
+            if (this.isMarked) {
                 state.update(numMines - --state.foundMines)
             }
         },
 
         // box marked as mine
         mark: function () {
-            this.marked = true
+            this.isMarked = true
             this.draw()
         },
 
@@ -106,11 +107,11 @@ const createBox = (ctx, x, y, row, col, width, height) => {
 
         // update this box
         draw: function () {
-            if (this.selected) {
+            if (this.isSelected) {
                 // selected, reveal symbol
                 clear()
                 this.isMine ? drawX() : drawNum(this.count)
-            } else if (this.marked) {
+            } else if (this.isMarked) {
                 // marked as mine
                 this.fillBox(markedColor)
             } else {
@@ -122,10 +123,10 @@ const createBox = (ctx, x, y, row, col, width, height) => {
             drawBorder()
         },
 
-        // reveal miens as circles
+        // reveal mines as circles
         win: function () {
             if (this.isMine) {
-                this.selected = true
+                this.isSelected = true
                 clear()
                 drawBorder()
 

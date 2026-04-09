@@ -38,12 +38,12 @@ const minesweeper = (function () {
     const hover = (point) => {
         if (hoverBox) hoverBox.draw()
         hoverBox = matrix.lookup(point)
-        if (hoverBox && !hoverBox.selected) hoverBox.hover()
+        if (hoverBox && !hoverBox.isSelected) hoverBox.hover()
     }
 
     // check if game finished
     const checkForWin = box => {
-        if (!box.selected && ++state.cleared === allCleared) {
+        if (!box.isSelected && ++state.cleared === allCleared) {
             matrix.forEach(box => box.win())
             state.playing = false
             state.win('we made it')
@@ -61,7 +61,7 @@ const minesweeper = (function () {
         if (box.count === 0) {
             const queue = []
             matrix.map(row, col, adjacent => {
-                if (!adjacent.selected && !queue.includes(adjacent)) {
+                if (!adjacent.isSelected && !queue.includes(adjacent)) {
                     queue.push(adjacent)
                 }
             })
@@ -87,7 +87,7 @@ const minesweeper = (function () {
 
     const rightClick = (point) => {
         const box = matrix.lookup(point)
-        if (box) {
+        if (box && !box.isMarked && !box.isSelected) {
             box.mark()
             state.update(numMines - ++state.foundMines)
         }
